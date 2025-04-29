@@ -15,6 +15,7 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { setupCamera, createControls } from './Controls.js';
 import { createTilesRenderer, registerPlugins } from './TileSystem.js';
 import { setupGUI, createInfoDisplay} from './Ui.js';
+import GoogleMapsIntegration from './GoogleMapsIntegration.js';
 
 export default class SceneRenderer {
 	constructor(container) {
@@ -38,6 +39,7 @@ export default class SceneRenderer {
 		this.controls = null;
 		this.stats = null;
 		this.statsContainer = null;
+		this.googleMaps = null;
 		
 		// Performance optimization
 		this.lastHashUpdate = 0;
@@ -70,6 +72,9 @@ export default class SceneRenderer {
 		// Set up UI elements
 		this.setupUI();
 		
+		// Initialize Google Maps integration
+		this.initGoogleMaps();
+		
 		// Set up window events
 		window.addEventListener('resize', () => this.onWindowResize(), false);
 		window.addEventListener('hashchange', () => this.initFromHash());
@@ -78,6 +83,24 @@ export default class SceneRenderer {
 		// Initialize from hash
 		this.initFromHash();
 		// Hash will be updated in the animation loop when needed, not on a timer
+	}
+	
+	initGoogleMaps() {
+		// Initialize Google Maps integration after tiles are loaded
+		if (this.tiles) {
+			this.googleMaps = new GoogleMapsIntegration(this);
+		} else {
+			console.warn('Tiles not initialized, deferring Google Maps integration');
+			
+			// Retry after a delay
+			setTimeout(() => {
+				if (this.tiles) {
+					this.googleMaps = new GoogleMapsIntegration(this);
+				} else {
+					console.error('Failed to initialize Google Maps integration: tiles not available');
+				}
+			}, 2000);
+		}
 	}
 	
 	setupRenderer() {
@@ -144,6 +167,11 @@ export default class SceneRenderer {
 			
 			// Add to scene
 			this.scene.add(this.tiles.group);
+			
+			// Reinitialize Google Maps integration if necessary
+			if (!this.googleMaps) {
+				this.initGoogleMaps();
+			}
 		}
 	}
 
@@ -230,8 +258,6 @@ export default class SceneRenderer {
 			roll: orientationResult.roll
 		};
 	}
-	
-	// Method removed as zoom slider is no longer needed
 
 	initFromHash() {
 		if (!this.tiles) {

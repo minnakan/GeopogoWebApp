@@ -31,7 +31,7 @@ export default class GoogleMapsIntegration {
         
         // Create the script element
         const script = document.createElement('script');
-        const API_KEY = ''; // Add your Google Maps API key here
+        const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY; // Add your Google Maps API key here
         
         script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places`;
         script.async = true;
@@ -333,5 +333,116 @@ export default class GoogleMapsIntegration {
         
         // Get the current camera position and orientation
         const currentCartographic = {};
-}
+        const currentOrientation = {};
+        const tilesMatInv = this.sceneRenderer.tiles.group.matrixWorld.clone().invert();
+        const localCameraPos = camera.position.clone().applyMatrix4(tilesMatInv);
+        const localCameraMat = camera.matrixWorld.clone().premultiply(tilesMatInv);
+        
+        WGS84_ELLIPSOID.getPositionToCartographic(localCameraPos, currentCartographic);
+        WGS84_ELLIPSOID.getAzElRollFromRotationMatrix(
+            currentCartographic.lat, currentCartographic.lon, localCameraMat,
+            currentOrientation, CAMERA_FRAME
+        );
+        
+        // Create a status message for flying animation
+        const statusElement = document.createElement('div');
+        statusElement.className = 'location-notification';
+        statusElement.textContent = `Flying to ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        document.body.appendChild(statusElement);
+        
+        // Set up animation parameters
+        const animationDuration = 3000; // 3 seconds
+        const startTime = performance.now();
+        
+        // Store target state for animation
+        const targetState = {
+            lat: latRad,
+            lng: lngRad,
+            height: viewingHeight,
+            azimuth: azimuth,
+            elevation: elevation,
+            roll: roll
+        };
+        
+        // Store start state for animation
+        const startState = {
+            lat: currentCartographic.lat,
+            lng: currentCartographic.lon,
+            height: currentCartographic.height,
+            azimuth: currentOrientation.azimuth,
+            elevation: currentOrientation.elevation,
+            roll: currentOrientation.roll
+        };
+        
+        // Animation function
+        const animateCamera = (timestamp) => {
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / animationDuration, 1);
+            
+            // Use an easing function for smoother motion
+            const easeProgress = this.easeInOutCubic(progress);
+            
+            // Interpolate between start and target states
+            const currentState = {
+                lat: this.lerp(startState.lat, targetState.lat, easeProgress),
+                lng: this.lerp(startState.lng, targetState.lng, easeProgress),
+                height: this.lerp(startState.height, targetState.height, easeProgress),
+                azimuth: this.lerp(startState.azimuth, targetState.azimuth, easeProgress),
+                elevation: this.lerp(startState.elevation, targetState.elevation, easeProgress),
+                roll: this.lerp(startState.roll, targetState.roll, easeProgress)
+            };
+            
+            // Update the camera position
+            this.updateCameraPosition(currentState);
+            
+            // Continue animation if not complete
+            if (progress < 1) {
+                requestAnimationFrame(animateCamera);
+            } else {
+                // Animation complete
+                console.log('Animation complete');
+                
+                // Update the notification message
+                statusElement.textContent = `Arrived at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                
+                // Remove notification after a delay
+                setTimeout(() => {
+                    if (document.body.contains(statusElement)) {
+                        document.body.removeChild(statusElement);
+                    }
+                }, 2000);
+            }
+        };
+        
+        // Start the animation
+        requestAnimationFrame(animateCamera);
+    }
+    
+    updateCameraPosition(state) {
+        const { transition } = this.sceneRenderer;
+        const camera = transition.camera;
+        
+        // Extract the east-north-up frame into matrix world
+        WGS84_ELLIPSOID.getRotationMatrixFromAzElRoll(
+            state.lat, state.lng, state.azimuth, state.elevation, state.roll,
+            camera.matrixWorld, CAMERA_FRAME
+        );
+        
+        // Apply the necessary tiles transform
+        camera.matrixWorld.premultiply(this.sceneRenderer.tiles.group.matrixWorld);
+        camera.matrixWorld.decompose(camera.position, camera.quaternion, camera.scale);
+        
+        // Get the position
+        WGS84_ELLIPSOID.getCartographicToPosition(state.lat, state.lng, state.height, camera.position);
+        camera.position.applyMatrix4(this.sceneRenderer.tiles.group.matrixWorld);
+    }
+    
+    // Utility functions for animation
+    lerp(a, b, t) {
+        return a + (b - a) * t;
+    }
+    
+    easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
 }

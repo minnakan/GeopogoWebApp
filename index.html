@@ -7,77 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- GENERAL -->
-    <title>Vite ThreeJS — Template</title>
-    <meta name="title" content="Vite ThreeJS — Template" />
-    <meta name="application-name" content="Vite ThreeJS — Template" />
+    <title>3D Earth Explorer</title>
+    <meta name="title" content="3D Earth Explorer" />
+    <meta name="application-name" content="3D Earth Explorer" />
     <meta
       name="description"
-      content="Boilerplate template designed to quickly bootstrapping a 3D Web App, SPA, website or landing page with Three.JS, GLSL, Vite, TailwindCSS, ESLint, Husky and much more in just 30 seconds."
+      content="Interactive 3D Earth visualization with Google Maps integration for location search and navigation."
     />
     <meta
       name="keywords"
       content="
-        three, three js, threejs, three.js, three-js, 
-        three template, three js template, threejs template, three.js template, three-js template, 
-        three vite, three js vite, threejs vite, three.js vite, three-js vite,
-        three vite template, three js vite templante, threejs vite templante, three.js vite templante, three-js vite templante,
-        webgl, 3D, GLSL, GLSL shaders, shaders, web3D,
-        javascript, js, vanilla-javascript, vanilla-js, 
-        development, template, boilerplate, template-boilerplate, boilerplate-frontend, starter-kit,
-        vite, vite template, swc, husky, eslint, commitlint, prettier,
-        postcss, tailwind, tailwindcss, sass, scss, css, 
-        github, web app, web-app, webapp, spa
+        three, three js, threejs, three.js, 3d-tiles-renderer, 
+        google maps, earth, globe, 3D, maps api, geocoding,
+        webgl, 3D, GLSL, web3D, javascript, vite
       "
     />
     <link rel="manifest" href="/app.webmanifest" />
     <link rel="icon" sizes="192x192" href="/favicon/favicon-192.webp" />
     <link rel="icon" sizes="512x512" href="/favicon/favicon-512.webp" />
-
-    <!-- GOOGLE -->
-    <meta name="rating" content="General" />
-    <meta name="robots" content="index,follow" />
-    <link
-      rel="sitemap"
-      type="application/xml"
-      title="Sitemap"
-      href="/sitemap.xml"
-    />
-    <meta
-      name="google-site-verification"
-      content="43hCqye5FYTS4SnBMPKNFP-wBhfLHwRBykWJF1WJawo"
-    />
-
-    <!-- FACEBOOK -->
-    <meta property="og:url" content="https://webpack-three-js.d1a.app" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Webpack ThreeJS — Template" />
-    <meta
-      property="og:description"
-      content="Boilerplate template designed to quickly bootstrapping a 3D Web App, SPA, website or landing page with Three.JS, GLSL, Vite, TailwindCSS, ESLint, Husky and much more in just 30 seconds."
-    />
-    <meta property="og:image" content="/og.jpg" />
-
-    <!-- TWITTER -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="webpack-three-js.d1a.app" />
-    <meta property="twitter:url" content="https://webpack-three-js.d1a.app" />
-    <meta name="twitter:title" content="Webpack ThreeJS — Template" />
-    <meta
-      name="twitter:description"
-      content="Boilerplate template designed to quickly bootstrapping a 3D Web App, SPA, website or landing page with Three.JS, GLSL, Vite, TailwindCSS, ESLint, Husky and much more in just 30 seconds."
-    />
-    <meta name="twitter:image" content="/og.jpg" />
-
-    <!-- iOS -->
-    <link rel="apple-touch-icon" href="/favicon/favicon-512.webp" />
-    <link rel="mask-icon" href="/favicon/favicon-512.webp" color="black" />
-    <meta name="apple-mobile-web-app-title" content="Vite ThreeJS — Template" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-
-    <!-- ANDROID -->
-    <meta name="theme-color" content="#000" />
-    <meta name="mobile-web-app-capable" content="yes" />
 
     <script defer src="/_vercel/insights/script.js"></script>
     
@@ -126,6 +73,91 @@
         bottom: 0;
         left: 0;
         z-index: 10;
+      }
+      
+      /* Google Maps Search UI Styles */
+      #search-container {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        width: 80%;
+        max-width: 600px;
+        font-family: 'Arial', sans-serif;
+      }
+
+      #search-box {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: white;
+        color: #333;
+      }
+
+      #search-box:focus {
+        outline: none;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+      }
+
+      #search-results {
+        width: 100%;
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: white;
+        border-radius: 0 0 4px 4px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        display: none;
+      }
+
+      .search-result {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .search-result:last-child {
+        border-bottom: none;
+      }
+
+      .search-result:hover {
+        background-color: #f5f5f5;
+      }
+
+      #search-error {
+        color: #d32f2f;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 8px 12px;
+        margin-top: 5px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: none;
+      }
+
+      /* Location message notification */
+      .location-notification {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 1000;
+        animation: fadeInOut 3s forwards;
+      }
+
+      @keyframes fadeInOut {
+        0% { opacity: 0; }
+        10% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { opacity: 0; }
       }
     </style>
   </head>
