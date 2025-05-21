@@ -40,3 +40,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Ignore all .env files
+.env
