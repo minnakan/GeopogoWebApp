@@ -1,6 +1,6 @@
-# TilesDemoJs
+# GeopogoWebApp
 
-A simple starter template for a 3D web application using Three.js, Cesium Ion, Google Maps, TailwindCSS, and Vite.
+WIP 3D web application using Three.js, Cesium Ion, Google Maps, TailwindCSS, and Vite.
 
 ## Setup
 
