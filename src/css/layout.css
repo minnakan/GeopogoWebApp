@@ -1,0 +1,75 @@
+/* Base layout styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000; /* Match the renderer background color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Scene container with 16:9 aspect ratio */
+  .scene-container {
+    position: relative;
+    width: 80%;
+    max-width: 1600px;
+    margin: 0 auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Create 16:9 aspect ratio using padding trick */
+  .scene-container::before {
+    content: "";
+    display: block;
+    padding-top: 56.25%; /* 9/16 = 0.5625 = 56.25% */
+  }
+  
+  /* Main content area */
+  main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: transparent;
+  }
+  
+  /* Canvas element */
+  #canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  
+  /* Info and credits styling */
+  #info, #credits {
+    color: white;
+    position: absolute;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
+    pointer-events: none;
+  }
+  
+  #info {
+    top: 0;
+    left: 0;
+    z-index: 10;
+  }
+  
+  #credits {
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 768px) {
+    .scene-container {
+      width: 95%;
+    }
+  }

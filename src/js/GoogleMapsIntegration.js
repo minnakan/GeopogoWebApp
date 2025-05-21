@@ -9,12 +9,10 @@ export default class GoogleMapsIntegration {
         this.autocompleteService = null;
         this.placesService = null;
         this.map = null;
-        this.searchBox = null;
-        this.searchResults = null;
         this.isLoaded = false;
         
-        // Create UI elements
-        this.createSearchUI();
+        // Find existing UI elements instead of creating new ones
+        this.initSearchUI();
         
         // Load Google Maps API
         this.loadGoogleMapsAPI();
@@ -87,62 +85,15 @@ export default class GoogleMapsIntegration {
         }
     }
     
-    createSearchUI() {
-        // Create search container
-        const searchContainer = document.createElement('div');
-        searchContainer.id = 'search-container';
-        searchContainer.style.position = 'absolute';
-        searchContainer.style.top = '20px';
-        searchContainer.style.left = '50%';
-        searchContainer.style.transform = 'translateX(-50%)';
-        searchContainer.style.zIndex = '1000';
-        searchContainer.style.width = '80%';
-        searchContainer.style.maxWidth = '600px';
+    initSearchUI() {
+        // Find existing elements instead of creating new ones
+        this.searchContainer = document.getElementById('search-container');
+        this.searchBox = document.getElementById('search-box');
+        this.searchResults = document.getElementById('search-results');
         
-        // Create search input
-        const searchBox = document.createElement('input');
-        searchBox.id = 'search-box';
-        searchBox.type = 'text';
-        searchBox.placeholder = 'Search for a location...';
-        searchBox.style.width = '100%';
-        searchBox.style.padding = '10px';
-        searchBox.style.fontSize = '16px';
-        searchBox.style.borderRadius = '4px';
-        searchBox.style.border = '1px solid #ccc';
-        searchBox.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
-        
-        // Create search results container
-        const searchResults = document.createElement('div');
-        searchResults.id = 'search-results';
-        searchResults.style.width = '100%';
-        searchResults.style.maxHeight = '300px';
-        searchResults.style.overflowY = 'auto';
-        searchResults.style.backgroundColor = 'white';
-        searchResults.style.borderRadius = '0 0 4px 4px';
-        searchResults.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.3)';
-        searchResults.style.display = 'none';
-        
-        // Create error message element
-        const errorElement = document.createElement('div');
-        errorElement.id = 'search-error';
-        errorElement.style.color = 'red';
-        errorElement.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-        errorElement.style.padding = '5px';
-        errorElement.style.marginTop = '5px';
-        errorElement.style.borderRadius = '4px';
-        errorElement.style.display = 'none';
-        
-        // Add elements to container
-        searchContainer.appendChild(searchBox);
-        searchContainer.appendChild(searchResults);
-        searchContainer.appendChild(errorElement);
-        
-        // Add container to body
-        document.body.appendChild(searchContainer);
-        
-        // Store references
-        this.searchBox = searchBox;
-        this.searchResults = searchResults;
+        if (!this.searchContainer || !this.searchBox || !this.searchResults) {
+            console.error('Search UI elements not found in the DOM');
+        }
     }
     
     initAutocomplete() {
@@ -221,18 +172,6 @@ export default class GoogleMapsIntegration {
             const resultItem = document.createElement('div');
             resultItem.className = 'search-result';
             resultItem.textContent = prediction.description;
-            resultItem.style.padding = '10px';
-            resultItem.style.borderBottom = '1px solid #eee';
-            resultItem.style.cursor = 'pointer';
-            
-            // Add hover effect
-            resultItem.addEventListener('mouseenter', () => {
-                resultItem.style.backgroundColor = '#f5f5f5';
-            });
-            
-            resultItem.addEventListener('mouseleave', () => {
-                resultItem.style.backgroundColor = 'white';
-            });
             
             // Add click event to select this place
             resultItem.addEventListener('click', () => {

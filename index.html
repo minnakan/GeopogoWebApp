@@ -26,150 +26,32 @@
     <link rel="icon" sizes="192x192" href="/favicon/favicon-192.webp" />
     <link rel="icon" sizes="512x512" href="/favicon/favicon-512.webp" />
 
+    <!-- CSS files -->
+    <link rel="stylesheet" href="src/css/layout.css" />
+    <link rel="stylesheet" href="src/css/search.css" />
+    <link rel="stylesheet" href="src/css/global.css" />
+
     <script defer src="/_vercel/insights/script.js"></script>
-    
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
-      
-      main {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: transparent;
-      }
-      
-      #canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      
-      #info, #credits {
-        color: white;
-        position: absolute;
-        padding: 10px;
-        font-family: monospace;
-        font-size: 12px;
-        text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
-        pointer-events: none;
-      }
-      
-      #info {
-        top: 0;
-        left: 0;
-        z-index: 10;
-      }
-      
-      #credits {
-        bottom: 0;
-        left: 0;
-        z-index: 10;
-      }
-      
-      /* Google Maps Search UI Styles */
-      #search-container {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
-        width: 80%;
-        max-width: 600px;
-        font-family: 'Arial', sans-serif;
-      }
-
-      #search-box {
-        width: 100%;
-        padding: 12px 15px;
-        font-size: 16px;
-        border-radius: 4px;
-        border: none;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        background-color: white;
-        color: #333;
-      }
-
-      #search-box:focus {
-        outline: none;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
-      }
-
-      #search-results {
-        width: 100%;
-        max-height: 300px;
-        overflow-y: auto;
-        background-color: white;
-        border-radius: 0 0 4px 4px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        display: none;
-      }
-
-      .search-result {
-        padding: 12px 15px;
-        border-bottom: 1px solid #eee;
-        cursor: pointer;
-        transition: background-color 0.2s;
-      }
-
-      .search-result:last-child {
-        border-bottom: none;
-      }
-
-      .search-result:hover {
-        background-color: #f5f5f5;
-      }
-
-      #search-error {
-        color: #d32f2f;
-        background-color: rgba(255, 255, 255, 0.9);
-        padding: 8px 12px;
-        margin-top: 5px;
-        border-radius: 4px;
-        font-size: 14px;
-        display: none;
-      }
-
-      /* Location message notification */
-      .location-notification {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 4px;
-        font-size: 14px;
-        z-index: 1000;
-        animation: fadeInOut 3s forwards;
-      }
-
-      @keyframes fadeInOut {
-        0% { opacity: 0; }
-        10% { opacity: 1; }
-        80% { opacity: 1; }
-        100% { opacity: 0; }
-      }
-    </style>
   </head>
   <body>
     <noscript class="text-center text-lg text-red-500">
       Enable JavaScript to enjoy all the features of this app.
     </noscript>
-    <main>
-      <div id="info"></div>
-      <div id="credits"></div>
-      <canvas id="canvas"></canvas>
-    </main>
+    
+    <div class="scene-container">
+      <main>
+        <div id="info"></div>
+        <div id="credits"></div>
+        <canvas id="canvas"></canvas>
+        
+        <!-- Search container moved inside main for proper positioning -->
+        <div id="search-container">
+          <input id="search-box" type="text" placeholder="Search for a location...">
+          <div id="search-results"></div>
+          <div id="search-error"></div>
+        </div>
+      </main>
+    </div>
 
     <script type="module" src="src/js/index.js"></script>
   </body>

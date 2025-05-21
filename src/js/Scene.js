@@ -177,17 +177,34 @@ export default class SceneRenderer {
 
 	onWindowResize() {
 		const { perspectiveCamera, orthographicCamera } = this.transition;
-		const aspect = window.innerWidth / window.innerHeight;
 		
+		// Get dimensions of actual container (now this is the main element inside scene-container)
+		const mainElement = this.container.parentElement;
+		const width = mainElement.clientWidth;
+		const height = mainElement.clientHeight;
+		
+		// The aspect ratio should be 16:9 (or very close)
+		const aspect = width / height;
+		
+		// Update perspective camera
 		perspectiveCamera.aspect = aspect;
 		perspectiveCamera.updateProjectionMatrix();
 		
+		// Update orthographic camera
 		orthographicCamera.left = -orthographicCamera.top * aspect;
 		orthographicCamera.right = -orthographicCamera.left;
 		orthographicCamera.updateProjectionMatrix();
 		
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		// Update renderer size to match container
+		this.renderer.setSize(width, height);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
+		
+		// If using tiles, update them
+		if (this.tiles) {
+			this.tiles.setResolutionFromRenderer(this.transition.camera, this.renderer);
+		}
+		
+		console.log(`Canvas resized to: ${width}x${height}, aspect ratio: ${aspect.toFixed(2)}`);
 	}
 
 	updateHash() {
